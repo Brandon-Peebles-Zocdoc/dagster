@@ -258,10 +258,11 @@ class Config(MakeConfigCacheable, metaclass=BaseConfigMeta):
         or EnvVars will be converted to the appropriate dictionary representation.
         """
         public_fields = self._get_non_none_public_field_values()
-        return {
+        res = {
             k: _config_value_to_dict_representation(model_fields(self).get(k), v)
             for k, v in public_fields.items()
         }
+        return res
 
     def _get_non_none_public_field_values(self) -> Mapping[str, Any]:
         """Returns a dictionary representation of this config object,
@@ -271,7 +272,7 @@ class Config(MakeConfigCacheable, metaclass=BaseConfigMeta):
         meaning any nested config objects will be returned as config objects, not dictionaries.
         """
         output = {}
-        for key, value in self.__dict__.items():
+        for key, value in dict(self).items():
             if self._is_field_internal(key):
                 continue
             field = model_fields(self).get(key)
